@@ -4,20 +4,21 @@ const morgan = require('morgan');
 const cors = require('cors');
 const helmet = require('helmet');
 const { NODE_ENV } = require('./config');
+const todosRouter = require('./todos/todos-router')
 
 const app = express();
 
-const morganOption = (NODE_ENV === 'production')
-  ? 'dev'
-  : 'common';
-
-app.use(morgan(morganOption));
+app.use(morgan((NODE_ENV === 'production') ? 'tiny' : 'common', {
+    skip: () => NODE_ENV === 'test',
+}))
 app.use(helmet());
 app.use(cors());
 
 app.get('/', (req, res) => {
     res.send('Hello, world!');
 })
+
+app.use('/api/todos', todosRouter)
 
 app.use(function errorHandler(error, req, res, next) {
     let response;
